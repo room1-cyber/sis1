@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --animate-spin-slow: spin 3s linear infinite;
+}
+
+@layer base {
+  a, button, [role="button"], .cursor-pointer {
+    cursor: pointer;
+  }
+
+  @media print {
+    aside, 
+    header, 
+    nav, 
+    button:not(.print-btn), 
+    .no-print,
+    .sidebar-overlay {
+      display: none !important;
+    }
+    
+    main {
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: auto !important;
+      overflow: visible !important;
+      background: white !important;
+    }
+
+    .flex-1 {
+      flex: none !important;
+    }
+
+    .overflow-y-auto {
+      overflow: visible !important;
+    }
+
+    .h-screen {
+      height: auto !important;
+    }
+
+    .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl {
+      box-shadow: none !important;
+    }
+
+    .border {
+      border-color: #e2e8f0 !important;
+    }
+
+    body {
+      background: white !important;
+    }
+
+    .max-w-7xl {
+      max-width: 100% !important;
+    }
+  }
+}

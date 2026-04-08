@@ -1,0 +1,487 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user with specific roles and permissions.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { 
+          "type": "string", 
+          "enum": ["student", "advisor", "lecturer", "dept_admin", "faculty_admin", "registrar", "admissions", "finance", "library", "timetable", "facilities", "invigilator", "it_support", "super_admin"]
+        },
+        "facultyId": { "type": "string" },
+        "departmentId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "suspended", "deactivated"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student master record.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "nationalId": { "type": "string" },
+        "nationality": { "type": "string" },
+        "dateOfBirth": { "type": "string", "format": "date" },
+        "gender": { "type": "string", "enum": ["male", "female"] },
+        "contactInfo": { "type": "object" },
+        "academicHistory": { "type": "array", "items": { "type": "object" } },
+        "currentProgramId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "suspended", "graduated", "withdrawn", "dismissed", "transferred"] },
+        "dueDate": { "type": "string", "format": "date" },
+        "emergencyContacts": { "type": "array", "items": { "type": "object" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "nationalId", "currentProgramId", "status"]
+    },
+    "Faculty": {
+      "title": "Faculty",
+      "description": "University faculty or college.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "deanId": { "type": "string" }
+      },
+      "required": ["name", "code"]
+    },
+    "Department": {
+      "title": "Department",
+      "description": "Academic department within a faculty.",
+      "type": "object",
+      "properties": {
+        "facultyId": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "headId": { "type": "string" }
+      },
+      "required": ["facultyId", "name", "code"]
+    },
+    "Program": {
+      "title": "Program",
+      "description": "Academic program or specialization.",
+      "type": "object",
+      "properties": {
+        "departmentId": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "degreeLevel": { "type": "string", "enum": ["bachelor", "master", "diploma"] },
+        "durationSemesters": { "type": "integer" },
+        "totalCredits": { "type": "integer" },
+        "curriculum": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["departmentId", "name", "code", "degreeLevel"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Individual course in the catalog.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "title": { "type": "string" },
+        "credits": { "type": "integer" },
+        "description": { "type": "string" },
+        "department": { "type": "string" },
+        "prerequisites": { "type": "array", "items": { "type": "string" } },
+        "learningOutcomes": { "type": "array", "items": { "type": "string" } },
+        "textbooks": { "type": "array", "items": { "type": "string" } },
+        "syllabusUrl": { "type": "string" },
+        "syllabusFileName": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive", "archived"] }
+      },
+      "required": ["code", "title", "credits", "department"]
+    },
+    "CourseOffering": {
+      "title": "Course Offering",
+      "description": "A specific section of a course offered in a term.",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "termId": { "type": "string" },
+        "section": { "type": "string" },
+        "instructorId": { "type": "string" },
+        "roomId": { "type": "string" },
+        "schedule": { "type": "array", "items": { "type": "object" } },
+        "capacity": { "type": "integer" },
+        "enrolledCount": { "type": "integer" }
+      },
+      "required": ["courseId", "termId", "section", "instructorId"]
+    },
+    "Enrollment": {
+      "title": "Enrollment",
+      "description": "Student enrollment in a course offering.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "offeringId": { "type": "string" },
+        "status": { "type": "string", "enum": ["enrolled", "dropped", "withdrawn", "completed"] },
+        "grade": { "type": "string" },
+        "gpaPoints": { "type": "number" }
+      },
+      "required": ["studentId", "offeringId", "status"]
+    },
+    "AttendanceSession": {
+      "title": "Attendance Session",
+      "description": "A specific class session where attendance is taken.",
+      "type": "object",
+      "properties": {
+        "offeringId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "lecturerId": { "type": "string" },
+        "status": { "type": "string", "enum": ["scheduled", "in_progress", "completed"] }
+      },
+      "required": ["offeringId", "date", "lecturerId", "status"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance Record",
+      "description": "Individual student attendance for a session.",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "status": { "type": "string", "enum": ["present", "absent", "late", "excused"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sessionId", "studentId", "status"]
+    },
+    "GradeAppeal": {
+      "title": "Grade Appeal",
+      "description": "Student appeal for a grade change.",
+      "type": "object",
+      "properties": {
+        "enrollmentId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["enrollmentId", "studentId", "reason", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial transaction (payment, refund, etc.).",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["tuition", "fee", "refund", "scholarship"] },
+        "method": { "type": "string", "enum": ["bank_transfer", "cash", "online"] },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed"] },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "amount", "type", "status", "date"]
+    },
+    "Scholarship": {
+      "title": "Scholarship",
+      "description": "Financial aid or scholarship awarded to a student.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "expired", "revoked"] },
+        "expiryDate": { "type": "string", "format": "date" }
+      },
+      "required": ["studentId", "name", "amount", "status"]
+    },
+    "ScheduleChangeRequest": {
+      "title": "Schedule Change Request",
+      "description": "Request to change a class schedule.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "offeringId": { "type": "string" },
+        "reason": { "type": "string" },
+        "preferredTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "offeringId", "reason", "status", "date"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "Student application for admission.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "program": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "highSchoolScore": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "program", "email", "status", "date"]
+    },
+    "CalendarEvent": {
+      "title": "Calendar Event",
+      "description": "Academic calendar event or holiday.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "type": { "type": "string", "enum": ["academic", "deadline", "exam", "national", "religious"] },
+        "status": { "type": "string", "enum": ["upcoming", "past"] }
+      },
+      "required": ["title", "date", "type"]
+    },
+    "LibraryBook": {
+      "title": "Library Book",
+      "description": "A book in the library collection.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string" },
+        "available": { "type": "boolean" },
+        "location": { "type": "string" },
+        "isbn": { "type": "string" },
+        "pages": { "type": "integer" },
+        "year": { "type": "integer" }
+      },
+      "required": ["title", "author", "available"]
+    },
+    "LibraryLoan": {
+      "title": "Library Loan",
+      "description": "A record of a borrowed book.",
+      "type": "object",
+      "properties": {
+        "bookId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "borrowedDate": { "type": "string", "format": "date" },
+        "dueDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["active", "returned", "overdue"] }
+      },
+      "required": ["bookId", "studentId", "borrowedDate", "dueDate", "status"]
+    },
+    "Exam": {
+      "title": "Exam",
+      "description": "Scheduled exam for a course.",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "roomId": { "type": "string" },
+        "seatNumber": { "type": "string" },
+        "studentId": { "type": "string" }
+      },
+      "required": ["courseId", "title", "date", "startTime", "endTime"]
+    },
+    "Document": {
+      "title": "Document",
+      "description": "A student document or record.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "verified", "rejected"] },
+        "date": { "type": "string", "format": "date" },
+        "size": { "type": "string" },
+        "userId": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["name", "type", "status", "date", "userId"]
+    },
+    "TransferRequest": {
+      "title": "Transfer Request",
+      "description": "A request for internal or external transfer.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "type": { "type": "string", "enum": ["Internal", "External"] },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["studentId", "type", "from", "to", "status", "date"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A messaging conversation between two or more users.",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "participantDetails": { "type": "object" },
+        "lastMessage": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "unreadCount": { "type": "object" }
+      },
+      "required": ["participants", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "An individual message within a conversation.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "readBy": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["conversationId", "senderId", "text", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notification for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["exam", "deadline", "finance", "system"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "link": { "type": "string" }
+      },
+      "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    },
+    "Building": {
+      "title": "Building",
+      "description": "University building.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "floors": { "type": "integer" },
+        "roomsCount": { "type": "integer" },
+        "status": { "type": "string", "enum": ["operational", "maintenance", "closed"] }
+      },
+      "required": ["name", "code"]
+    },
+    "Room": {
+      "title": "Room",
+      "description": "Room within a building.",
+      "type": "object",
+      "properties": {
+        "buildingId": { "type": "string" },
+        "code": { "type": "string" },
+        "type": { "type": "string", "enum": ["Lecture Hall", "Computer Lab", "Seminar Room", "Office", "Lab"] },
+        "capacity": { "type": "integer" },
+        "floor": { "type": "string" },
+        "department": { "type": "string" },
+        "equipment": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["available", "occupied", "maintenance"] }
+      },
+      "required": ["buildingId", "code", "type", "capacity"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles and roles."
+    },
+    "/students/{uid}": {
+      "schema": "Student",
+      "description": "Detailed student academic and personal records."
+    },
+    "/faculties/{facultyId}": {
+      "schema": "Faculty",
+      "description": "Faculties in the university."
+    },
+    "/departments/{deptId}": {
+      "schema": "Department",
+      "description": "Departments within faculties."
+    },
+    "/programs/{programId}": {
+      "schema": "Program",
+      "description": "Academic programs."
+    },
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Course catalog."
+    },
+    "/offerings/{offeringId}": {
+      "schema": "CourseOffering",
+      "description": "Course sections offered per term."
+    },
+    "/enrollments/{enrollmentId}": {
+      "schema": "Enrollment",
+      "description": "Student course enrollments."
+    },
+    "/attendanceSessions/{sessionId}": {
+      "schema": "AttendanceSession",
+      "description": "Class sessions for attendance."
+    },
+    "/attendanceRecords/{recordId}": {
+      "schema": "AttendanceRecord",
+      "description": "Individual attendance entries."
+    },
+    "/appeals/{appealId}": {
+      "schema": "GradeAppeal",
+      "description": "Grade appeals filed by students."
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Financial transactions."
+    },
+    "/scholarships/{scholarshipId}": {
+      "schema": "Scholarship",
+      "description": "Student scholarships."
+    },
+    "/scheduleChangeRequests/{requestId}": {
+      "schema": "ScheduleChangeRequest",
+      "description": "Requests for schedule changes."
+    },
+    "/applications/{applicationId}": {
+      "schema": "Application",
+      "description": "Admission applications."
+    },
+    "/calendarEvents/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Academic calendar events."
+    },
+    "/libraryBooks/{bookId}": {
+      "schema": "LibraryBook",
+      "description": "Books available in the university library."
+    },
+    "/libraryLoans/{loanId}": {
+      "schema": "LibraryLoan",
+      "description": "Records of books borrowed by students."
+    },
+    "/examSchedules/{examId}": {
+      "schema": "Exam",
+      "description": "University exam schedules."
+    },
+    "/documents/{docId}": {
+      "schema": "Document",
+      "description": "Student documents."
+    },
+    "/transferRequests/{requestId}": {
+      "schema": "TransferRequest",
+      "description": "Student transfer requests."
+    },
+    "/conversations/{convId}": {
+      "schema": "Conversation",
+      "description": "Messaging conversations."
+    },
+    "/conversations/{convId}/messages/{msgId}": {
+      "schema": "Message",
+      "description": "Messages within a conversation."
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications."
+    },
+    "/buildings/{buildingId}": {
+      "schema": "Building",
+      "description": "University buildings."
+    },
+    "/rooms/{roomId}": {
+      "schema": "Room",
+      "description": "Rooms within buildings."
+    }
+  }
+}

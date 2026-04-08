@@ -1,0 +1,5 @@
+{
+  "name": "Remix: Libyan University SIS",
+  "description": "A comprehensive Student Information System for Libyan Universities, featuring role-based access control, academic management, and bilingual support.",
+  "requestFramePermissions": []
+}
